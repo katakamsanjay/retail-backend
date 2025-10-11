@@ -8,10 +8,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(cors({
-  origin: "https://retail-frontend-silk.vercel.app/",
-  credentials: true
-}));
+
 
 // MongoDB connection with TLS fix for Windows
 const connectDB = async () => {
