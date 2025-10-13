@@ -44,4 +44,18 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
+//category filter option
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const { category } = req.query;
+    const query = category ? { category } : {};
+    const products = await Product.find(query);
+    res.json(products);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+
+
 module.exports = router;
