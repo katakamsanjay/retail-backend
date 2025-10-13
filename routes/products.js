@@ -1,46 +1,46 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
-const authMiddleware = require("../middleware/auth");
+const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
 
-// Add Product (Admin only)
-router.post("/", authMiddleware("admin"), async (req, res) => {
+// Admin: Add product
+router.post("/", verifyToken, isAdmin, async (req, res) => {
   try {
     const product = new Product(req.body);
     await product.save();
     res.status(201).json(product);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ message: err.message });
   }
 });
 
-// Get all products
-router.get("/", authMiddleware(), async (req, res) => {
+// Admin: Update product
+router.put("/:id", verifyToken, isAdmin, async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ message: err.message });
   }
 });
 
-// Update product (Admin only)
-router.put("/:id", authMiddleware("admin"), async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(product);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Delete product (Admin only)
-router.delete("/:id", authMiddleware("admin"), async (req, res) => {
+// Admin: Delete product
+router.delete("/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ message: "Product deleted" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// All users: View products
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 

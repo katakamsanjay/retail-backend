@@ -9,31 +9,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connection with TLS fix for Windows
+// MongoDB connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      tlsAllowInvalidCertificates: true // fixes TLS/SSL error on Windows
-    });
+    await mongoose.connect(process.env.MONGO_URI, { tlsAllowInvalidCertificates: true });
     console.log("✅ MongoDB connected successfully");
   } catch (err) {
     console.error("❌ MongoDB connection failed:", err.message);
     process.exit(1);
   }
 };
-
 connectDB();
 
 // Test route
-app.get("/", (req, res) => {
-  res.send("Backend is running with MongoDB Atlas!");
-});
+app.get("/", (req, res) => res.send("Backend is running!"));
 
-// Routes (later: auth & products)
-const authRoutes = require("./routes/auth");
-const productRoutes = require("./routes/products");
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
+// Routes
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/products", require("./routes/products"));
 
 // Start server
 const PORT = process.env.PORT || 5000;
