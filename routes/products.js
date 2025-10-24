@@ -13,26 +13,30 @@ router.post("/", verifyToken, isAdmin, async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-
-// Admin: Update product
-router.put("/:id", verifyToken, isAdmin, async (req, res) => {
+// Update a product
+router.put("/:id", verifyToken, async (req, res) => {
   try {
-    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { id } = req.params;
+    const updated = await Product.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: "Product not found" });
     res.json(updated);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Admin: Delete product
-router.delete("/:id", verifyToken, isAdmin, async (req, res) => {
+// Delete a product
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "Product deleted" });
+    const { id } = req.params;
+    const deleted = await Product.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: "Product not found" });
+    res.json({ message: "Product deleted successfully" });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
+
 
 // All users: View products
 router.get("/", verifyToken, async (req, res) => {

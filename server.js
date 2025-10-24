@@ -9,8 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-
+// MongoDB connection
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, { tlsAllowInvalidCertificates: true });
@@ -30,6 +29,9 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/products", require("./routes/products"));
 app.use("/api/categories", require("./routes/categories"));
 
+// --- New Orders Route ---
+const orderRoutes = require("./routes/orderRoutes");
+app.use("/api/orders", orderRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
